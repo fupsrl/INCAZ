@@ -10,12 +10,12 @@
   <rect x="2" y="2" width="876" height="216" rx="18" fill="none"
         stroke="#3ddc97" stroke-opacity="0.25" stroke-width="3"/>
 
-  <!-- oscilloscope trace under everything -->
-  <path d="M 30 178 Q 45 150 60 178 T 90 178 T 120 178 T 150 178 T 180 178
-           T 210 178 T 240 178 T 270 178 T 300 178 T 330 178 T 360 178
-           T 390 178 T 420 178 T 450 178 T 480 178 T 510 178 T 540 178
-           T 570 178 T 600 178 T 630 178 T 660 178 T 690 178 T 720 178
-           T 750 178 T 780 178 T 810 178 T 840 178"
+  <!-- oscilloscope trace along the bottom, below all text -->
+  <path d="M 30 192 Q 45 168 60 192 T 90 192 T 120 192 T 150 192 T 180 192
+           T 210 192 T 240 192 T 270 192 T 300 192 T 330 192 T 360 192
+           T 390 192 T 420 192 T 450 192 T 480 192 T 510 192 T 540 192
+           T 570 192 T 600 192 T 630 192 T 660 192 T 690 192 T 720 192
+           T 750 192 T 780 192 T 810 192 T 840 192"
         fill="none" stroke="#3ddc97" stroke-width="5" stroke-linecap="round"/>
 
   <!-- pixel llama (8px cells, offset 40,28), facing left -->
