@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 220">
+  <!-- INCAZ README banner: llama + wordmark + zero-cost tagline. -->
+  <defs>
+    <linearGradient id="bbg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#16233f"/>
+      <stop offset="1" stop-color="#0c3a3a"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="876" height="216" rx="18" fill="url(#bbg)"/>
+  <rect x="2" y="2" width="876" height="216" rx="18" fill="none"
+        stroke="#3ddc97" stroke-opacity="0.25" stroke-width="3"/>
+
+  <!-- oscilloscope trace under everything -->
+  <path d="M 30 178 Q 45 150 60 178 T 90 178 T 120 178 T 150 178 T 180 178
+           T 210 178 T 240 178 T 270 178 T 300 178 T 330 178 T 360 178
+           T 390 178 T 420 178 T 450 178 T 480 178 T 510 178 T 540 178
+           T 570 178 T 600 178 T 630 178 T 660 178 T 690 178 T 720 178
+           T 750 178 T 780 178 T 810 178 T 840 178"
+        fill="none" stroke="#3ddc97" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- pixel llama (8px cells, offset 40,28), facing left -->
+  <g fill="#f4f1e8">
+    <rect x="56" y="28" width="8" height="8"/>
+    <rect x="72" y="28" width="8" height="8"/>
+    <rect x="56" y="36" width="24" height="8"/>
+    <rect x="40" y="44" width="40" height="8"/>
+    <rect x="64" y="52" width="16" height="32"/>
+    <rect x="64" y="84" width="64" height="24"/>
+    <rect x="128" y="76" width="8" height="16"/>
+    <rect x="64" y="108" width="16" height="16"/>
+    <rect x="112" y="108" width="16" height="16"/>
+  </g>
+  <rect x="47" y="46" width="5" height="5" fill="#16233f"/>
+
+  <!-- zero-cost badge next to the llama -->
+  <rect x="120" y="26" width="30" height="30" rx="6" fill="#e63946"
+        transform="rotate(45 135 41)"/>
+  <polyline points="127,33 143,33 127,49 143,49" fill="none" stroke="#ffffff"
+            stroke-width="5" stroke-linecap="square"/>
+
+  <!-- wordmark -->
+  <text x="200" y="102" font-family="Segoe UI, Arial, sans-serif" font-size="76"
+        font-weight="bold" fill="#f4f1e8" letter-spacing="6">INCA</text>
+  <text x="408" y="102" font-family="Segoe UI, Arial, sans-serif" font-size="76"
+        font-weight="bold" fill="#e63946" letter-spacing="6">Z</text>
+  <text x="202" y="140" font-family="Segoe UI, Arial, sans-serif" font-size="24"
+        fill="#dbe6f5">INtegrated Calibration &amp; Acquisition, Zero-cost</text>
+  <text x="202" y="167" font-family="Segoe UI, Arial, sans-serif" font-size="17"
+        font-style="italic" fill="#a8c3e0">measure. calibrate. flash. 100% llama-powered, 0% license server.</text>
+</svg>

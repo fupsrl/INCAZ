@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "incaz"
+version = "0.1.0"
+description = "Open-source ECU measurement & calibration tool for XCP on Ethernet - A2L, HEX, DAQ, MF4 recording and flash programming"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "INCAZ contributors" }]
+requires-python = ">=3.10"
+keywords = ["XCP", "ASAP2", "A2L", "calibration", "measurement", "MDF", "MF4", "automotive", "ECU"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering",
+]
+dependencies = [
+    "pyxcp>=0.22",
+    "asammdf>=7.3",
+    "intelhex>=2.3",
+    "numpy>=1.24",
+    "PySide6>=6.5",
+    "pyqtgraph>=0.13",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0"]
+
+[project.gui-scripts]
+incaz = "incaz.app:main"
+
+[tool.setuptools.packages.find]
+include = ["incaz*"]
+
+[tool.setuptools.package-data]
+incaz = ["assets/*.svg"]

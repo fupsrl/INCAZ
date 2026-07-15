@@ -1,0 +1,195 @@
+/* INCAZ demo A2L - matches the XCP slave simulator (python -m incaz.sim) */
+ASAP2_VERSION 1 61
+
+/begin PROJECT INCAZ_Demo "INCAZ demonstration project"
+
+  /begin HEADER "Demo ECU for INCAZ - engine dummy model"
+  /end HEADER
+
+  /begin MODULE DemoECU "Demo engine controller"
+
+    /begin MOD_COMMON "common"
+      BYTE_ORDER MSB_LAST
+      ALIGNMENT_BYTE 1
+      ALIGNMENT_WORD 2
+      ALIGNMENT_LONG 4
+      ALIGNMENT_FLOAT32_IEEE 4
+    /end MOD_COMMON
+
+    /begin MOD_PAR "parameters"
+      /begin MEMORY_SEGMENT Cal_Segment "calibration data" DATA FLASH INTERN
+        0x00020000 0x1000 -1 -1 -1 -1 -1
+      /end MEMORY_SEGMENT
+      /begin MEMORY_SEGMENT Meas_Segment "measurement RAM" DATA RAM INTERN
+        0x00010000 0x1000 -1 -1 -1 -1 -1
+      /end MEMORY_SEGMENT
+    /end MOD_PAR
+
+    /begin IF_DATA XCP
+      /begin PROTOCOL_LAYER
+        0x0100 1000 2000 0 0 0 0 0 64 512 BYTE_ORDER_MSB_LAST ADDRESS_GRANULARITY_BYTE
+      /end PROTOCOL_LAYER
+      /begin DAQ
+        DYNAMIC 0 2 0 OPTIMISATION_TYPE_DEFAULT ADDRESS_EXTENSION_FREE
+        IDENTIFICATION_FIELD_TYPE_ABSOLUTE GRANULARITY_ODT_ENTRY_SIZE_DAQ_BYTE
+        0xC8 NO_OVERLOAD_INDICATION
+        /begin EVENT "10ms task" "10ms" 0x0000 DAQ 0xFF 10 6 0
+        /end EVENT
+        /begin EVENT "100ms task" "100ms" 0x0001 DAQ 0xFF 100 6 1
+        /end EVENT
+      /end DAQ
+      /begin XCP_ON_UDP_IP 0x0100 5555 ADDRESS "127.0.0.1"
+      /end XCP_ON_UDP_IP
+    /end IF_DATA
+
+    /* ------------------------------------------------ conversions */
+    /begin COMPU_METHOD CM_IDENT "1:1"
+      IDENTICAL "%8.0f" ""
+    /end COMPU_METHOD
+
+    /begin COMPU_METHOD CM_RPM "engine speed"
+      LINEAR "%6.0f" "rpm"
+      COEFFS_LINEAR 0.25 0
+    /end COMPU_METHOD
+
+    /begin COMPU_METHOD CM_RPM_F "engine speed float"
+      IDENTICAL "%7.1f" "rpm"
+    /end COMPU_METHOD
+
+    /begin COMPU_METHOD CM_TEMP "coolant temperature"
+      RAT_FUNC "%5.1f" "degC"
+      COEFFS 0 1 48 0 0 0.75
+    /end COMPU_METHOD
+
+    /begin COMPU_METHOD CM_PERCENT "percent"
+      LINEAR "%5.1f" "%"
+      COEFFS_LINEAR 1 0
+    /end COMPU_METHOD
+
+    /begin COMPU_METHOD CM_VOLT "battery voltage"
+      LINEAR "%6.2f" "V"
+      COEFFS_LINEAR 0.001 0
+    /end COMPU_METHOD
+
+    /begin COMPU_METHOD CM_GEAR "gear position"
+      TAB_VERB "%3.0f" ""
+      COMPU_TAB_REF VT_GEAR
+    /end COMPU_METHOD
+
+    /begin COMPU_VTAB VT_GEAR "gear names" TAB_VERB 6
+      0 "P"  1 "R"  2 "N"  3 "D"  4 "S"  5 "M"
+    /end COMPU_VTAB
+
+    /begin COMPU_METHOD CM_GAIN "gain factor"
+      IDENTICAL "%5.2f" "-"
+    /end COMPU_METHOD
+
+    /begin COMPU_METHOD CM_TORQUE "torque"
+      LINEAR "%6.1f" "Nm"
+      COEFFS_LINEAR 0.1 0
+    /end COMPU_METHOD
+
+    /begin COMPU_METHOD CM_IGN "ignition angle"
+      LINEAR "%5.1f" "deg"
+      COEFFS_LINEAR 0.5 -10
+    /end COMPU_METHOD
+
+    /* ------------------------------------------------ record layouts */
+    /begin RECORD_LAYOUT RL_U8
+      FNC_VALUES 1 UBYTE COLUMN_DIR DIRECT
+    /end RECORD_LAYOUT
+
+    /begin RECORD_LAYOUT RL_U16
+      FNC_VALUES 1 UWORD COLUMN_DIR DIRECT
+    /end RECORD_LAYOUT
+
+    /begin RECORD_LAYOUT RL_F32
+      FNC_VALUES 1 FLOAT32_IEEE COLUMN_DIR DIRECT
+    /end RECORD_LAYOUT
+
+    /begin RECORD_LAYOUT RL_CURVE_TQ
+      AXIS_PTS_X 1 UWORD INDEX_INCR DIRECT
+      FNC_VALUES 2 SWORD COLUMN_DIR DIRECT
+    /end RECORD_LAYOUT
+
+    /begin RECORD_LAYOUT RL_MAP_IGN
+      AXIS_PTS_X 1 UWORD INDEX_INCR DIRECT
+      AXIS_PTS_Y 2 UWORD INDEX_INCR DIRECT
+      FNC_VALUES 3 UBYTE ROW_DIR DIRECT
+    /end RECORD_LAYOUT
+
+    /* ------------------------------------------------ measurements */
+    /begin MEASUREMENT Counter "free running counter"
+      ULONG CM_IDENT 0 0 0 4294967295
+      ECU_ADDRESS 0x00010000
+    /end MEASUREMENT
+
+    /begin MEASUREMENT EngineSpeed "engine speed"
+      UWORD CM_RPM 0 0 0 16000
+      ECU_ADDRESS 0x00010004
+    /end MEASUREMENT
+
+    /begin MEASUREMENT CoolantTemp "coolant temperature"
+      UBYTE CM_TEMP 0 0 -48 143
+      ECU_ADDRESS 0x00010006
+    /end MEASUREMENT
+
+    /begin MEASUREMENT ThrottlePos "throttle position"
+      UBYTE CM_PERCENT 0 0 0 100
+      ECU_ADDRESS 0x00010007
+    /end MEASUREMENT
+
+    /begin MEASUREMENT GearPos "gear position"
+      UBYTE CM_GEAR 0 0 0 5
+      ECU_ADDRESS 0x00010008
+    /end MEASUREMENT
+
+    /begin MEASUREMENT BattVoltage "battery voltage"
+      UWORD CM_VOLT 0 0 0 20
+      ECU_ADDRESS 0x0001000A
+    /end MEASUREMENT
+
+    /begin MEASUREMENT EngineSpeedF "engine speed (float copy)"
+      FLOAT32_IEEE CM_RPM_F 0 0 0 16000
+      ECU_ADDRESS 0x0001000C
+    /end MEASUREMENT
+
+    /* ------------------------------------------------ characteristics */
+    /begin CHARACTERISTIC ScalarGain "speed model gain factor"
+      VALUE 0x00020000 RL_F32 4.0 CM_GAIN 0 4.0
+    /end CHARACTERISTIC
+
+    /begin CHARACTERISTIC SpeedLimit "maximum engine speed"
+      VALUE 0x00020004 RL_U16 16000 CM_RPM 0 16000
+    /end CHARACTERISTIC
+
+    /begin CHARACTERISTIC FanOnTemp "fan switch-on temperature"
+      VALUE 0x00020006 RL_U8 143 CM_TEMP -48 143
+    /end CHARACTERISTIC
+
+    /begin CHARACTERISTIC TorqueCurve "full load torque over engine speed"
+      CURVE 0x00020010 RL_CURVE_TQ 500 CM_TORQUE -500 500
+      /begin AXIS_DESCR STD_AXIS EngineSpeed CM_RPM 8 0 16000
+      /end AXIS_DESCR
+    /end CHARACTERISTIC
+
+    /begin CHARACTERISTIC IgnitionMap "base ignition angle"
+      MAP 0x00020040 RL_MAP_IGN 55 CM_IGN -10 55
+      /begin AXIS_DESCR STD_AXIS EngineSpeed CM_RPM 6 0 16000
+      /end AXIS_DESCR
+      /begin AXIS_DESCR STD_AXIS ThrottlePos CM_PERCENT 6 0 100
+      /end AXIS_DESCR
+    /end CHARACTERISTIC
+
+    /* ------------------------------------------------ groups */
+    /begin GROUP Engine "engine signals" ROOT
+      /begin REF_MEASUREMENT
+        Counter EngineSpeed CoolantTemp ThrottlePos GearPos BattVoltage EngineSpeedF
+      /end REF_MEASUREMENT
+      /begin REF_CHARACTERISTIC
+        ScalarGain SpeedLimit FanOnTemp TorqueCurve IgnitionMap
+      /end REF_CHARACTERISTIC
+    /end GROUP
+
+  /end MODULE
+/end PROJECT
